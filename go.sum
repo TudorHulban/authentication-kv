@@ -8,8 +8,8 @@ github.com/TudorHulban/authentication v0.0.0-20210620095052-9898853d1b08/go.mod 
 github.com/TudorHulban/kv v0.0.0-20210620073312-a83af484dd62/go.mod h1:AHm9Zlm9JEhByjGhi39OLW64M9KwN8axO6u9VqwNcGA=
 github.com/TudorHulban/kv v0.0.0-20210620083134-c4bbd9eda5ad h1:65OomIMWheow0oKlgWI1YzrvnknDjsib6Qaobl3RRNk=
 github.com/TudorHulban/kv v0.0.0-20210620083134-c4bbd9eda5ad/go.mod h1:U+mtkO1ZNANSZtWZAJzC2iwmWQy9kvfhclLHO789t4Q=
-github.com/TudorHulban/kv-badger v0.0.0-20210620084825-81a8b0a97b58 h1:VeSqbfoYGBFzRLY44xjvIYMVIQhrZ3YYbLTBw1bG4MU=
-github.com/TudorHulban/kv-badger v0.0.0-20210620084825-81a8b0a97b58/go.mod h1:vSBXa9hcJcEyNzMglcPY7fnky7Q+28zDyx6JqHhbsE8=
+github.com/TudorHulban/kv-badger v0.0.0-20210620100816-b4f091a6970b h1:ZJSpBWmJT2LZzvqvsO1tiDpr40StLdGq73sctWu5xPM=
+github.com/TudorHulban/kv-badger v0.0.0-20210620100816-b4f091a6970b/go.mod h1:vSBXa9hcJcEyNzMglcPY7fnky7Q+28zDyx6JqHhbsE8=
 github.com/TudorHulban/log v0.0.0-20200831150322-5cca386c96e5/go.mod h1:ew305nN8YryUTCYmLewSYkDsgLnlhUGMrFxhvastTLI=
 github.com/TudorHulban/log v0.0.0-20210324101504-5b18a3c2067b h1:BTXwy90NjUAQnGlj3KorRWl8hod7fkU4G2ThPYWFaBE=
 github.com/TudorHulban/log v0.0.0-20210324101504-5b18a3c2067b/go.mod h1:ew305nN8YryUTCYmLewSYkDsgLnlhUGMrFxhvastTLI=

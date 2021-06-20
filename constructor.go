@@ -14,29 +14,41 @@ type Config struct {
 }
 
 type AuthKV struct {
-	kv.KVStore
-
-	Cfg Config
+	Config
 }
 
 var _ auth.IAuthenticator = &AuthKV{}
 
-func NewKVAuth(cfg Config) (auth.IAuthenticator, error) {
+func ConfigBadger() (*Config, error) {
 	store, errStore := badger.NewBStoreInMem(log.NewLogger(log.DEBUG, os.Stdout, true))
 	if errStore != nil {
 		return nil, errStore
 	}
 
-	return &AuthKV{
-		KVStore: store,
+	return &Config{
+		Store: store,
+	}, nil
+}
 
-		Cfg: cfg,
+func NewKVAuth(cfg Config) (auth.IAuthenticator, error) {
+	return &AuthKV{
+		Config: cfg,
 	}, nil
 }
 
 // interface methods to be implemented
-func (k *AuthKV) Create(auth.Customer) error {
-	return nil
+func (k *AuthKV) Create(c auth.Customer) error {
+	payload, errEnc := badger.Encoder(c)
+	if errEnc != nil {
+		return errEnc
+	}
+
+	value := kv.KV{
+		Key:   []byte(c.EMail),
+		Value: payload,
+	}
+
+	return k.Store.Set(value)
 }
 
 func (k *AuthKV) UpdateEmail(custID int64, newEmail string) error           { return nil }
