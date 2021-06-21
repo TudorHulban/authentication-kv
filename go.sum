@@ -9,6 +9,10 @@ github.com/TudorHulban/authentication v0.0.0-20210621104523-bd3ac283bc57 h1:0wiG
 github.com/TudorHulban/authentication v0.0.0-20210621104523-bd3ac283bc57/go.mod h1:4JdTAE3AdsvMAJEHjJ1Ov/HubM+qlZ4LJHFX8WGCnGY=
 github.com/TudorHulban/authentication v0.0.0-20210621105936-6518c99e8d3d h1:CzMTOfkhF4hjrEFlQ8mS3120OnT4To4tFvfbSzZtAsA=
 github.com/TudorHulban/authentication v0.0.0-20210621105936-6518c99e8d3d/go.mod h1:4JdTAE3AdsvMAJEHjJ1Ov/HubM+qlZ4LJHFX8WGCnGY=
+github.com/TudorHulban/authentication v0.0.0-20210621113938-e161a7bbf59c h1:wkuFZQzJiOnUB3koW6FMrUL79VBeEJDoz2am/aKrU5k=
+github.com/TudorHulban/authentication v0.0.0-20210621113938-e161a7bbf59c/go.mod h1:OW5T8ySkblJOyXT7/HsGstuVBFrZQHeT8TtzamsnCWU=
+github.com/TudorHulban/authentication v0.0.0-20210621115750-663371365950 h1:YiMYxfIcKQ9G23a3LdEdfEB2KQ7mGCWqJrn5xS/qG8s=
+github.com/TudorHulban/authentication v0.0.0-20210621115750-663371365950/go.mod h1:OW5T8ySkblJOyXT7/HsGstuVBFrZQHeT8TtzamsnCWU=
 github.com/TudorHulban/kv v0.0.0-20210620073312-a83af484dd62/go.mod h1:AHm9Zlm9JEhByjGhi39OLW64M9KwN8axO6u9VqwNcGA=
 github.com/TudorHulban/kv v0.0.0-20210620083134-c4bbd9eda5ad h1:65OomIMWheow0oKlgWI1YzrvnknDjsib6Qaobl3RRNk=
 github.com/TudorHulban/kv v0.0.0-20210620083134-c4bbd9eda5ad/go.mod h1:U+mtkO1ZNANSZtWZAJzC2iwmWQy9kvfhclLHO789t4Q=
