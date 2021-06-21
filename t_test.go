@@ -54,4 +54,10 @@ func TestAll(t *testing.T) {
 	require.Nil(t, au.UpdatePassword(cust.EMail, newPass))
 	require.Equal(t, au.Authenticate(cust.EMail, passwordRaw), auth.ErrUnknownCredentials)
 	require.Nil(t, au.Authenticate(cust.EMail, newPass))
+
+	genPass, errPass := au.LostPasswordRequest(cust.EMail)
+	require.Nil(t, errPass)
+	require.Nil(t, au.Authenticate(cust.EMail, genPass))
+
+	require.Nil(t, au.Delete(cust.EMail))
 }

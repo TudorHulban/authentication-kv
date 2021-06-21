@@ -114,8 +114,20 @@ func (k *AuthKV) Authenticate(email, password string) error {
 	return nil
 }
 
-func (k *AuthKV) LostPasswordRequest(email string) (string, error) { return "", nil }
-func (k *AuthKV) Delete(email string) error                        { return nil }
+// LostPasswordRequest Method checks if valid email. If yes returns temporary password.
+func (k *AuthKV) LostPasswordRequest(email string) (string, error) {
+	generatedPass := auth.RandomString(10)
+
+	if errUpd := k.UpdatePassword(email, generatedPass); errUpd != nil {
+		return "", errUpd // TODO: check if better return internal error for better security
+	}
+
+	return generatedPass, nil
+}
+
+func (k *AuthKV) Delete(email string) error {
+	return k.Store.DeleteKVByK([]byte(email))
+}
 
 func (k *AuthKV) CustomerDetails(email string) (*auth.Customer, error) {
 	cust, errGet := k.Store.GetVByK([]byte(email))
