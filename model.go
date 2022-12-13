@@ -1,9 +1,10 @@
 package authenticationkv
 
 import (
+	"fmt"
 	"os"
 
-	"github.com/TudorHulban/authentication"
+	auth "github.com/TudorHulban/authentication"
 	"github.com/TudorHulban/kv"
 	badger "github.com/TudorHulban/kv-badger"
 	"github.com/TudorHulban/log"
@@ -41,7 +42,7 @@ func NewKVAuth(cfg *Config) (*AuthKV, error) {
 
 // Create Method to create customer.
 // Password is not hashed when passing the object. Salt would be overwritten.
-func (k *AuthKV) Create(cust auth.Customer) error {
+func (k *AuthKV) Create(cust *auth.Customer) error {
 	if _, errExists := k.CustomerDetails(cust.EMail); errExists == nil {
 		return auth.ErrEmailExists
 	}
@@ -59,55 +60,74 @@ func (k *AuthKV) Create(cust auth.Customer) error {
 	return k.storeCustomer(cust)
 }
 
-func (k *AuthKV) storeCustomer(c auth.Customer) error {
+func (k *AuthKV) storeCustomer(c *auth.Customer) error {
 	payload, errEnc := badger.Encoder(c)
 	if errEnc != nil {
-		return errEnc
+		return TransformationError{
+			Issue: errEnc,
+		}
 	}
 
-	value := kv.KV{
+	item := kv.KV{
 		Key:   []byte(c.EMail),
 		Value: payload,
 	}
 
-	return k.Store.Set(value)
+	return k.Store.Set(item)
 }
 
-func (k *AuthKV) UpdateName(email, firstName, lastName string) error {
-	cust, errDet := k.CustomerDetails(email)
-	if errDet != nil {
-		return errDet
+func (k *AuthKV) UpdateName(email string, firstName, lastName *string) error {
+	var haveUpdates bool
+
+	if firstName != nil || lastName != nil {
+		haveUpdates = true
 	}
 
-	cust.FirstName = firstName
-	cust.LastName = lastName
+	if !haveUpdates {
+		return nil
+	}
 
-	return k.storeCustomer(*cust)
+	reconstructedCustomer, errDetails := k.CustomerDetails(email)
+	if errDetails != nil {
+		return errDetails
+	}
+
+	if firstName != nil || lastName != nil {
+		reconstructedCustomer.FirstName = *firstName
+	}
+
+	if lastName != nil {
+		reconstructedCustomer.LastName = *lastName
+
+		haveUpdates = true
+	}
+
+	return k.storeCustomer(reconstructedCustomer)
 }
 
 func (k *AuthKV) UpdatePassword(email, newPassword string) error {
-	cust, errDet := k.CustomerDetails(email)
-	if errDet != nil {
-		return errDet
+	reconstructedCustomer, errDetails := k.CustomerDetails(email)
+	if errDetails != nil {
+		return errDetails
 	}
 
-	hash, errHash := auth.HASHPassword(newPassword, cust.PasswordSalt, 14)
+	hash, errHash := auth.HASHPassword(newPassword, reconstructedCustomer.PasswordSalt, 14)
 	if errHash != nil {
 		return errHash
 	}
 
-	cust.PasswordHash = string(hash)
+	reconstructedCustomer.PasswordHash = string(hash)
 
-	return k.storeCustomer(*cust)
+	return k.storeCustomer(reconstructedCustomer)
 }
 
 func (k *AuthKV) Authenticate(email, password string) error {
-	cust, errDet := k.CustomerDetails(email)
-	if errDet != nil {
+	reconstructedCustomer, errDetails := k.CustomerDetails(email)
+	if errDetails != nil {
 		return auth.ErrInternal
 	}
 
-	if !auth.CheckPasswordHash(password, cust.PasswordSalt, cust.PasswordHash) {
+	if !auth.CheckPasswordHash(password, reconstructedCustomer.PasswordSalt, reconstructedCustomer.PasswordHash) {
 		return auth.ErrUnknownCredentials
 	}
 
@@ -116,27 +136,48 @@ func (k *AuthKV) Authenticate(email, password string) error {
 
 // LostPasswordRequest Method checks if valid email. If yes returns temporary password.
 func (k *AuthKV) LostPasswordRequest(email string) (string, error) {
+	if _, errDetails := k.CustomerDetails(email); errDetails != nil {
+		return "", errDetails
+	}
+
 	generatedPass := auth.RandomString(10)
 
 	if errUpd := k.UpdatePassword(email, generatedPass); errUpd != nil {
-		return "", errUpd // TODO: check if better return internal error for better security
+		return "", errUpd
 	}
 
 	return generatedPass, nil
 }
 
-func (k *AuthKV) Delete(email string) error {
+func (k *AuthKV) DeleteCustomer(email string) error {
+	if _, errDetails := k.CustomerDetails(email); errDetails != nil {
+		return errDetails
+	}
+
 	return k.Store.DeleteKVByK([]byte(email))
 }
 
 func (k *AuthKV) CustomerDetails(email string) (*auth.Customer, error) {
 	cust, errGet := k.Store.GetVByK([]byte(email))
 	if errGet != nil {
-		return nil, errGet
+		return nil, KVStoreError{
+			Issue: errGet,
+		}
 	}
 
 	var c auth.Customer
-	errDecode := auth.Decoder(cust, &c)
 
-	return &c, errDecode
+	if errDecode := auth.Decoder(cust, &c); errDecode != nil {
+		return nil, TransformationError{
+			Issue: errDecode,
+		}
+	}
+
+	if &c == nil {
+		return nil, ItemNotFoundError{
+			Issue: fmt.Errorf("customer with email:%s was not found", email),
+		}
+	}
+
+	return &c, nil
 }

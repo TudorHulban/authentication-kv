@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TudorHulban/authentication"
+	auth "github.com/TudorHulban/authentication"
 	"github.com/stretchr/testify/require"
 )
 
@@ -26,7 +26,7 @@ func TestAll(t *testing.T) {
 		Role:         "admin",
 	}
 
-	require.Nil(t, au.Create(cust), "creating customer")
+	require.NoError(t, au.Create(&cust), "creating customer")
 
 	c1, errDet1 := au.CustomerDetails(cust.EMail)
 	require.Nil(t, errDet1, "fetching details")
@@ -36,18 +36,18 @@ func TestAll(t *testing.T) {
 
 	require.Equal(t, cust, *c1)
 
-	require.Equal(t, auth.ErrEmailExists, au.Create(cust), "customer email already exists")
+	require.Equal(t, auth.ErrEmailExists, au.Create(&cust), "customer email already exists")
 
 	first := "Johnathan"
 	last := "Roy"
 
-	au.UpdateName(cust.EMail, first, last)
+	au.UpdateName(cust.EMail, &first, &last)
 
 	c2, errDet2 := au.CustomerDetails(cust.EMail)
 	require.Nil(t, errDet2, "fetching details")
 	require.Equal(t, first, c2.FirstName)
 
-	require.Nil(t, au.Authenticate(cust.EMail, passwordRaw), "succesfull authentication")
+	require.NoError(t, au.Authenticate(cust.EMail, passwordRaw), "succesfull authentication")
 
 	newPass := "yyy"
 
@@ -59,5 +59,5 @@ func TestAll(t *testing.T) {
 	require.Nil(t, errPass)
 	require.Nil(t, au.Authenticate(cust.EMail, genPass))
 
-	require.Nil(t, au.Delete(cust.EMail))
+	require.Nil(t, au.DeleteCustomer(cust.EMail))
 }
